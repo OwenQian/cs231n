@@ -43,6 +43,7 @@ def svm_loss_naive(W, X, y, reg):
   dW /= num_train
   # Add regularization to the loss.
   loss += reg * np.sum(W * W)
+  dW += 2*reg*W
 
   #############################################################################
   # TODO:                                                                     #
@@ -71,7 +72,21 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
+  scores = X.dot(W)  
+  correct_scores = scores[range(y.shape[0]), y]
+  print(type(correct_scores))
+  res = np.reshape(correct_scores, (500,1))
+  res = np.resize(res, (500,10))
+  print('res', res)
+  temp = scores - res + 1
+  print('temp', temp)
+  z = np.zeros(temp.shape)
+  #print('z shape:', z.shape)
+  m = np.maximum(temp, z)
+  #print(m.shape)
+  #print(m)
+  s = np.sum(m)-1
+  loss += s
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
