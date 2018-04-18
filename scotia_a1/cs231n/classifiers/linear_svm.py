@@ -70,21 +70,22 @@ def svm_loss_vectorized(W, X, y, reg):
   num_train = X.shape[0]
   num_classes = W.shape[1]
   scores = X.dot(W)
-  correct_scores = scores[range(num_train), y].reshape(num_train, 1)
+  correct_scores = scores[np.arange(num_train), y].reshape(num_train, 1)
 
-  diff = scores-correct_scores+1
-  # take the max of the diff and 0
-  hinge = np.maximum(diff, np.zeros((num_train, num_classes)))
-  # subtract 1 because we included the correct class which contributes +1 to the loss
-  hinge = np.sum(hinge, axis=1)-1
-    
-  loss += np.sum(hinge)/num_train
-  loss += reg*np.sum(W*W)
-  pass
+  diff = np.maximum(0, scores-correct_scores+1)
+  diff[np.arange(num_train), y] = 0
+  # because we included the correct class so subtract num_train
+  loss = np.sum(diff) / num_train + reg*np.sum(W*W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
-
+  coeffs = np.where(diff > 0, 1, 0)
+  
+  # clear out the score for the correct class
+  coeffs[np.arange(num_train), y] = 0
+  coeffs[np.arange(num_train), y] = -np.sum(coeffs, axis=1)
+    
+  dW = (X.T).dot(coeffs) / num_train + 2*reg*W
 
   #############################################################################
   # TODO:                                                                     #
