@@ -37,8 +37,9 @@ class LinearClassifier(object):
     # Run stochastic gradient descent to optimize W
     loss_history = []
     for it in range(num_iters):
-      X_batch = None
-      y_batch = None
+      indices = np.random.choice(num_train, batch_size)
+      X_batch = X[indices]
+      y_batch = y[indices]
 
       #########################################################################
       # TODO:                                                                 #
@@ -51,7 +52,6 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -65,7 +65,7 @@ class LinearClassifier(object):
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
+      self.W -= learning_rate * grad;
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -89,12 +89,12 @@ class LinearClassifier(object):
       array of length N, and each element is an integer giving the predicted
       class.
     """
-    y_pred = np.zeros(X.shape[0])
+    scores = X.dot(self.W)
+    y_pred = np.argmax(scores, axis=1)
     ###########################################################################
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    pass
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################

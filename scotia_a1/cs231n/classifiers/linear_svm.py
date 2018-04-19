@@ -73,32 +73,14 @@ def svm_loss_vectorized(W, X, y, reg):
   correct_scores = scores[np.arange(num_train), y].reshape(num_train, 1)
 
   diff = np.maximum(0, scores-correct_scores+1)
-  diff[np.arange(num_train), y] = 0
-  # because we included the correct class so subtract num_train
-  loss = np.sum(diff) / num_train + reg*np.sum(W*W)
-  #############################################################################
-  #                             END OF YOUR CODE                              #
-  #############################################################################
-  coeffs = np.where(diff > 0, 1, 0)
-  
   # clear out the score for the correct class
-  coeffs[np.arange(num_train), y] = 0
+  diff[np.arange(num_train), y] = 0
+  coeffs = np.zeros((num_train, num_classes))
+  coeffs[diff > 0] = 1
+  
   coeffs[np.arange(num_train), y] = -np.sum(coeffs, axis=1)
     
+  loss = np.sum(diff) / num_train + reg*np.sum(W*W)
   dW = (X.T).dot(coeffs) / num_train + 2*reg*W
-
-  #############################################################################
-  # TODO:                                                                     #
-  # Implement a vectorized version of the gradient for the structured SVM     #
-  # loss, storing the result in dW.                                           #
-  #                                                                           #
-  # Hint: Instead of computing the gradient from scratch, it may be easier    #
-  # to reuse some of the intermediate values that you used to compute the     #
-  # loss.                                                                     #
-  #############################################################################
-  pass
-  #############################################################################
-  #                             END OF YOUR CODE                              #
-  #############################################################################
 
   return loss, dW
