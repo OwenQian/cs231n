@@ -73,20 +73,13 @@ def svm_loss_vectorized(W, X, y, reg):
   # result in loss.                                                           #
   #############################################################################
   scores = X.dot(W)  
-  correct_scores = scores[range(y.shape[0]), y]
-  print(type(correct_scores))
-  res = np.reshape(correct_scores, (500,1))
-  res = np.resize(res, (500,10))
-  print('res', res)
-  temp = scores - res + 1
-  print('temp', temp)
-  z = np.zeros(temp.shape)
-  #print('z shape:', z.shape)
-  m = np.maximum(temp, z)
-  #print(m.shape)
-  #print(m)
-  s = np.sum(m)-1
-  loss += s
+  num_train = X.shape[0]
+  num_classes = W.shape[1]
+  correct_score_indices = (np.arange(num_train), y)
+  correct_scores = scores[correct_score_indices].reshape(num_train,1)
+  diff = scores - correct_scores + 1
+  diff[correct_score_indices] = 0
+  loss = np.sum(np.maximum(0, diff)) / num_train + reg * np.sum(W*W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -101,7 +94,10 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
+  coeffs = np.zeros((num_train, num_classes))
+  coeffs[diff > 0] = 1
+  coeffs[correct_score_indices] = -np.sum(coeffs, axis=1)
+  dW = (X.T).dot(coeffs) / num_train + 2 * reg * W
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
